@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>LowerBlock Store</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top, #102d50 0%, #07131f 35%, #03080d 100%);
+      color: white;
+      min-height: 100vh;
+    }
+
+    /* =========================
+       TOP BAR
+    ========================== */
+
+    .topbar {
+      min-height: 80px;
+      background: rgba(5, 12, 20, 0.96);
+      border-bottom: 2px solid #198cff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 5%;
+      gap: 30px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 0 20px rgba(0, 140, 255, 0.2);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: white;
+    }
+
+    .brand img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+    }
+
+    .brand-name {
+      font-size: 25px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .brand-name span {
+      color: #39a7ff;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .nav button {
+      border: 1px solid #214a6c;
+      background: #0d2133;
+      color: #e6f5ff;
+      padding: 11px 17px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      background: #168cf0;
+      border-color: #56b8ff;
+      transform: translateY(-1px);
+    }
+
+    /* =========================
+       PLAYER LOGIN
+    ========================== */
+
+    .player-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #playerHead {
+      width: 46px;
+      height: 46px;
+      border-radius: 6px;
+      image-rendering: pixelated;
+      border: 2px solid #258cff;
+      display: none;
+    }
+
+    .login-button {
+      background: #168cf0;
+      color: white;
+      border: none;
+      padding: 11px 16px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* =========================
+       HERO
+    ========================== */
+
+    .hero {
+      text-align: center;
+      padding: 75px 20px 45px;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 75px);
+      margin-bottom: 12px;
+    }
+
+    .hero h1 span {
+      color: #28a5ff;
+      text-shadow: 0 0 30px rgba(0, 157, 255, 0.45);
+    }
+
+    .hero p {
+      color: #a9c9df;
+      font-size: 18px;
+      max-width: 700px;
+      margin: auto;
+      line-height: 1.55;
+    }
+
+    /* =========================
+       MAIN
+    ========================== */
+
+    .container {
+      width: min(1200px, 92%);
+      margin: auto;
+      padding-bottom: 80px;
+    }
+
+    .section-title {
+      font-size: 30px;
+      margin: 35px 0 20px;
+    }
+
+    .store-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .store-card {
+      min-height: 245px;
+      background: linear-gradient(145deg, #0d1b29, #07111b);
+      border: 1px solid #1e425e;
+      border-radius: 13px;
+      text-align: center;
+      padding: 28px 20px;
+      transition: 0.25s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .store-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top,
+        rgba(33, 156, 255, 0.16),
+        transparent 55%);
+      pointer-events: none;
+    }
+
+    .store-card:hover {
+      border-color: #299eff;
+      box-shadow: 0 0 25px rgba(21, 145, 255, 0.25);
+      transform: translateY(-5px);
+    }
+
+    .store-card img {
+      width: 105px;
+      height: 105px;
+      object-fit: contain;
+      margin-bottom: 14px;
+    }
+
+    .store-card h3 {
+      font-size: 23px;
+      color: #5ebaff;
+      margin-bottom: 7px;
+    }
+
+    .store-card p {
+      color: #a6bdce;
+      line-height: 1.4;
+    }
+
+    /* =========================
+       PRODUCT SECTION
+    ========================== */
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .product {
+      background: #091723;
+      border: 1px solid #21425a;
+      border-radius: 13px;
+      overflow: hidden;
+      transition: 0.25s;
+    }
+
+    .product:hover {
+      transform: translateY(-4px);
+      border-color: #269cf8;
+      box-shadow: 0 0 24px rgba(35, 155, 255, 0.18);
+    }
+
+    .product-image {
+      height: 205px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle, rgba(29, 123, 190, .22), transparent 60%);
+    }
+
+    .product-image img {
+      max-width: 80%;
+      max-height: 170px;
+      object-fit: contain;
+    }
+
+    .product-content {
+      padding: 21px;
+    }
+
+    .product-content h3 {
+      font-size: 22px;
+      margin-bottom: 9px;
+    }
+
+    .product-content p {
+      color: #a5bbcc;
+      line-height: 1.5;
+      min-height: 65px;
+    }
+
+    .price {
+      display: block;
+      color: #55b8ff;
+      font-size: 21px;
+      font-weight: bold;
+      margin: 18px 0 12px;
+    }
+
+    .buy {
+      width: 100%;
+      border: none;
+      background: linear-gradient(90deg, #0877db, #29a8ff);
+      color: white;
+      padding: 12px;
+      border-radius: 7px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .buy:hover {
+      filter: brightness(1.12);
+    }
+
+    /* =========================
+       MODAL
+    ========================== */
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .82);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      width: min(430px, 100%);
+      background: #0a1925;
+      border: 2px solid #228fff;
+      border-radius: 15px;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(25, 142, 255, .3);
+    }
+
+    .modal-box h2 {
+      margin-bottom: 10px;
+    }
+
+    .modal-box p {
+      color: #a9bfce;
+      margin-bottom: 18px;
+    }
+
+    .username-input {
+      width: 100%;
+      padding: 14px;
+      background: #06111b;
+      color: white;
+      border: 1px solid #31536b;
+      border-radius: 7px;
+      font-size: 17px;
+      outline: none;
+    }
+
+    .username-input:focus {
+      border-color: #269cff;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .continue {
+      background: #168df0;
+      color: white;
+    }
+
+    .cancel {
+      background: #263746;
+      color: white;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================== */
+
+    @media (max-width: 900px) {
+      .store-grid,
+      .products {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .topbar {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 580px) {
+      .store-grid,
+      .products {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP BAR -->
+
+  <header class="topbar">
+
+    <a class="brand" href="index.html">
+      <img src="lowerblock-logo.png" alt="LowerBlock Logo">
+      <div class="brand-name">LOWER<span>BLOCK</span></div>
+    </a>
+
+    <nav class="nav">
+      <button class="active">Store</button>
+      <button onclick="scrollToSection('ranks')">Ranks</button>
+      <button onclick="scrollToSection('bundles')">Bundles</button>
+      <button onclick="scrollToSection('pets')">Pets</button>
+      <button onclick="scrollToSection('capes')">Capes</button>
+      <button onclick="scrollToSection('effects')">Effects</button>
+    </nav>
+
+    <div class="player-area">
+
+      <img id="playerHead" alt="Minecraft Head">
+
+      <span id="playerName"></span>
+
+      <button class="login-button" onclick="openLogin()">
+        Minecraft Login
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- HERO -->
+
+  <section class="hero">
+    <h1>LowerBlock <span>Store</span></h1>
+
+    <p>
+      Upgrade your LowerBlock experience with ranks, pets,
+      exclusive capes, Elytras, magical effects and themed bundles.
+    </p>
+  </section>
+
+
+  <main class="container">
+
+    <!-- STORE CATEGORIES -->
+
+    <h2 class="section-title">Store</h2>
+
+    <section class="store-grid">
+
+      <div class="store-card" onclick="scrollToSection('ranks')">
+        <img src="images/ranks.png">
+        <h3>Ranks</h3>
+        <p>VIP through MVP++.</p>
+      </div>
+
+      <div class="store-card" onclick="scrollToSection('bundles')">
+        <img src="images/bundles.png">
+        <h3>Bundles</h3>
+        <p>Complete themed cosmetic collections.</p>
+      </div>
+
+      <div class="store-card" onclick="scrollToSection('pets')">
+        <img src="images/pets.png">
+        <h3>Pets</h3>
+        <p>Collect tiny companions that follow you.</p>
+      </div>
+
+      <div class="store-card" onclick="scrollToSection('capes')">
+        <img src="images/capes.png">
+        <h3>Capes & Elytras</h3>
+        <p>Exclusive LowerBlock cape designs.</p>
+      </div>
+
+      <div class="store-card" onclick="scrollToSection('effects')">
+        <img src="images/effects.png">
+        <h3>Effects</h3>
+        <p>Wings, auras, particles and trails.</p>
+      </div>
+
+      <div class="store-card">
+        <img src="images/boosters.png">
+        <h3>Boosters</h3>
+        <p>Server and game boosters.</p>
+      </div>
+
+    </section>
+
+
+    <!-- RANKS -->
+
+    <section id="ranks">
+
+      <h2 class="section-title">👑 Ranks</h2>
+
+      <div class="products">
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/vip.png">
+          </div>
+          <div class="product-content">
+            <h3>VIP</h3>
+            <p>
+              VIP prefix, /sit, /hat, extra homes,
+              extra auction slots and basic cosmetics.
+            </p>
+            <span class="price">$4.99</span>
+            <button class="buy">BUY VIP</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/vip-plus.png">
+          </div>
+          <div class="product-content">
+            <h3>VIP+</h3>
+            <p>
+              Everything in VIP plus /lay, /crawl,
+              more homes and more cosmetics.
+            </p>
+            <span class="price">$9.99</span>
+            <button class="buy">BUY VIP+</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/vip-plus-plus.png">
+          </div>
+          <div class="product-content">
+            <h3>VIP++</h3>
+            <p>
+              Everything in VIP+ plus nickname colors,
+              additional commands and premium cosmetics.
+            </p>
+            <span class="price">$14.99</span>
+            <button class="buy">BUY VIP++</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/mvp.png">
+          </div>
+          <div class="product-content">
+            <h3>MVP</h3>
+            <p>
+              Everything below it plus more commands,
+              effects, pets and customization.
+            </p>
+            <span class="price">$19.99</span>
+            <button class="buy">BUY MVP</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/mvp-plus.png">
+          </div>
+          <div class="product-content">
+            <h3>MVP+</h3>
+            <p>
+              Custom plus color, more name customization
+              and additional premium perks.
+            </p>
+            <span class="price">$29.99</span>
+            <button class="buy">BUY MVP+</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/mvp-plus-plus.png">
+          </div>
+          <div class="product-content">
+            <h3>MVP++</h3>
+            <p>
+              All rank perks, full customization,
+              exclusive cosmetics and flight in the lobby.
+            </p>
+            <span class="price">$39.99</span>
+            <button class="buy">BUY MVP++</button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- BUNDLES -->
+
+    <section id="bundles">
+
+      <h2 class="section-title">🎁 Bundles</h2>
+
+      <div class="products">
+
+        <div class="product">
+
+          <div class="product-image">
+            <img src="images/enderman-bundle.png">
+          </div>
+
+          <div class="product-content">
+
+            <h3>Enderman Bundle</h3>
+
+            <p>
+              Baby Enderman • Enderman Cape • Enderman Elytra •
+              Enderman Wings • Enderman Aura
+            </p>
+
+            <span class="price">$12.99</span>
+
+            <button class="buy">BUY BUNDLE</button>
+
+          </div>
+
+        </div>
+
+
+        <div class="product">
+
+          <div class="product-image">
+            <img src="images/creeper-bundle.png">
+          </div>
+
+          <div class="product-content">
+
+            <h3>Creeper Bundle</h3>
+
+            <p>
+              Baby Creeper • Creeper Cape • Creeper Elytra •
+              Creeper Wings • Explosion Aura
+            </p>
+
+            <span class="price">$12.99</span>
+
+            <button class="buy">BUY BUNDLE</button>
+
+          </div>
+
+        </div>
+
+
+        <div class="product">
+
+          <div class="product-image">
+            <img src="images/lowerblock-bundle.png">
+          </div>
+
+          <div class="product-content">
+
+            <h3>LowerBlock Bundle</h3>
+
+            <p>
+              LowerBlock L Cape • Custom Elytra • Blue Wings •
+              Blue Magic Aura • LowerBlock Pet
+            </p>
+
+            <span class="price">$14.99</span>
+
+            <button class="buy">BUY BUNDLE</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- PETS -->
+
+    <section id="pets">
+
+      <h2 class="section-title">🐾 Pets</h2>
+
+      <div class="products">
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/baby-enderman.png">
+          </div>
+          <div class="product-content">
+            <h3>Baby Enderman</h3>
+            <p>A tiny Enderman companion that follows you around LowerBlock.</p>
+            <span class="price">$3.99</span>
+            <button class="buy">BUY PET</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/baby-creeper.png">
+          </div>
+          <div class="product-content">
+            <h3>Baby Creeper</h3>
+            <p>A tiny Creeper companion. Don't worry — he won't explode.</p>
+            <span class="price">$3.99</span>
+            <button class="buy">BUY PET</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/baby-dragon.png">
+          </div>
+          <div class="product-content">
+            <h3>Baby Dragon</h3>
+            <p>A miniature flying dragon companion.</p>
+            <span class="price">$5.99</span>
+            <button class="buy">BUY PET</button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- CAPES -->
+
+    <section id="capes">
+
+      <h2 class="section-title">🧥 Capes & Elytras</h2>
+
+      <div class="products">
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/lowerblock-cape.png">
+          </div>
+          <div class="product-content">
+            <h3>LowerBlock Cape</h3>
+            <p>
+              The signature blue LowerBlock cape with a matching
+              custom LowerBlock Elytra.
+            </p>
+            <span class="price">$5.99</span>
+            <button class="buy">BUY CAPE</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/enderman-cape.png">
+          </div>
+          <div class="product-content">
+            <h3>Enderman Cape</h3>
+            <p>
+              Dark Enderman cape with purple eyes and matching Elytra.
+            </p>
+            <span class="price">$4.99</span>
+            <button class="buy">BUY CAPE</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/creeper-cape.png">
+          </div>
+          <div class="product-content">
+            <h3>Creeper Cape</h3>
+            <p>
+              Creeper-inspired cape with matching green Creeper Elytra.
+            </p>
+            <span class="price">$4.99</span>
+            <button class="buy">BUY CAPE</button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- EFFECTS -->
+
+    <section id="effects">
+
+      <h2 class="section-title">✨ Effects</h2>
+
+      <div class="products">
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/magic-wings.png">
+          </div>
+          <div class="product-content">
+            <h3>Magic Wings</h3>
+            <p>Glowing magical particle wings behind your player.</p>
+            <span class="price">$3.99</span>
+            <button class="buy">BUY EFFECT</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/fire-wings.png">
+          </div>
+          <div class="product-content">
+            <h3>Fire Wings</h3>
+            <p>Animated flame particles shaped like giant wings.</p>
+            <span class="price">$3.99</span>
+            <button class="buy">BUY EFFECT</button>
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-image">
+            <img src="images/fire-cape-effect.png">
+          </div>
+          <div class="product-content">
+            <h3>Fire Cape Effect</h3>
+            <p>A flowing cape made entirely from flame particles.</p>
+            <span class="price">$2.99</span>
+            <button class="buy">BUY EFFECT</button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- LOGIN POPUP -->
+
+  <div class="modal" id="loginModal">
+
+    <div class="modal-box">
+
+      <h2>Connect Minecraft</h2>
+
+      <p>
+        Enter your Minecraft username. No website password required.
+      </p>
+
+      <input
+        id="username"
+        class="username-input"
+        placeholder="Minecraft Username"
+        maxlength="16"
+      >
+
+      <div class="modal-actions">
+
+        <button class="cancel" onclick="closeLogin()">
+          Cancel
+        </button>
+
+        <button class="continue" onclick="connectPlayer()">
+          Continue
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    function scrollToSection(id) {
+      document.getElementById(id).scrollIntoView({
+        behavior: "smooth"
+      });
+    }
+
+
+    function openLogin() {
+      document.getElementById("loginModal").style.display = "flex";
+    }
+
+
+    function closeLogin() {
+      document.getElementById("loginModal").style.display = "none";
+    }
+
+
+    function connectPlayer() {
+
+      const username =
+        document.getElementById("username").value.trim();
+
+      if (!username) {
+        alert("Enter your Minecraft username.");
+        return;
+      }
+
+      const head =
+        document.getElementById("playerHead");
+
+      head.src =
+        "https://mc-heads.net/avatar/" +
+        encodeURIComponent(username) +
+        "/100";
+
+      head.style.display = "block";
+
+      document.getElementById("playerName").textContent =
+        username;
+
+      localStorage.setItem(
+        "lowerblockMinecraftUsername",
+        username
+      );
+
+      closeLogin();
+    }
+
+
+    window.addEventListener("load", function () {
+
+      const savedUsername =
+        localStorage.getItem(
+          "lowerblockMinecraftUsername"
+        );
+
+      if (savedUsername) {
+
+        document.getElementById("playerName").textContent =
+          savedUsername;
+
+        const head =
+          document.getElementById("playerHead");
+
+        head.src =
+          "https://mc-heads.net/avatar/" +
+          encodeURIComponent(savedUsername) +
+          "/100";
+
+        head.style.display = "block";
+      }
+
+    });
+
+  </script>
+
+</body>
+</html>
