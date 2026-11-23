@@ -44,17 +44,22 @@
     legend { padding: 0 6px; font-weight: bold; }
     input[readonly] { background: #102335; color: #d5e7f5; }
     .card-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    #status { margin-top: 14px; }
+    input::placeholder { color: #adc5d8; opacity: 1; }
+    input[readonly]:focus::placeholder { color: transparent; }
+    dialog { width: min(92%, 420px); color: white; }
+    dialog::backdrop { background: #03080dcc; }
+    dialog h2 { margin-bottom: 16px; }
+    .dialog-actions { display: flex; gap: 12px; }
+    .secondary { background: #263746; color: white; }
     .note { color: #adc5d8; margin-bottom: 18px; }
   </style>
   <script src="checkout.js" defer></script>
 </head>
 <body>
   <header>
-    <a href="index.html"><img src="lowerblock-logo.png (2).png" alt=""> LOWERBLOCK</a>
+    <a href="index.html" id="brand"><img src="lowerblock-logo.png (2).png" alt=""> LOWERBLOCK</a>
   </header>
   <main>
-    <a href="store.html">← Back to store</a>
     <h1>Checkout</h1>
     <p id="loading" role="status">Loading your item…</p>
     <noscript>Enable JavaScript to load your selection.</noscript>
@@ -67,37 +72,46 @@
           <strong id="price"></strong>
         </div>
       </div>
-      <p class="note">Test checkout. No payment will be collected and no items will be delivered.</p>
+      <p class="note">No payment is collected on this page.</p>
       <form id="preview">
         <label for="username">Minecraft username</label>
         <input id="username" required minlength="3" maxlength="16" pattern="[A-Za-z0-9_]{3,16}"
           title="Use 3–16 letters, numbers, or underscores." autocapitalize="off" spellcheck="false">
-        <fieldset aria-describedby="test-details">
-          <legend>Test payment details</legend>
-          <p class="note" id="test-details">Sample details are filled in for you. Use them to try the checkout.</p>
+        <fieldset>
+          <legend>Payment details</legend>
           <label for="test-email">Email</label>
-          <input id="test-email" type="email" value="player@example.com" readonly autocomplete="off">
+          <input id="test-email" type="email" placeholder="name@example.com" readonly autocomplete="off">
           <label for="test-name">Name on card</label>
-          <input id="test-name" value="Test Player" readonly autocomplete="off">
+          <input id="test-name" placeholder="Full Name" readonly autocomplete="off">
           <label for="test-card">Card number</label>
-          <input id="test-card" value="4242 4242 4242 4242" readonly autocomplete="off">
+          <input id="test-card" placeholder="0000 0000 0000 0000" readonly autocomplete="off">
           <div class="card-fields">
             <div>
               <label for="test-expiry">Expiration</label>
-              <input id="test-expiry" value="12/30" readonly autocomplete="off">
+              <input id="test-expiry" placeholder="MM/YY" readonly autocomplete="off">
             </div>
             <div>
               <label for="test-cvc">Security code</label>
-              <input id="test-cvc" value="123" readonly autocomplete="off">
+              <input id="test-cvc" placeholder="000" readonly autocomplete="off">
             </div>
           </div>
           <label for="test-zip">Billing ZIP code</label>
-          <input id="test-zip" value="00000" readonly autocomplete="off">
+          <input id="test-zip" placeholder="00000" readonly autocomplete="off">
         </fieldset>
-        <button type="submit">Place test order</button>
-        <p id="status" role="status"></p>
+        <button type="submit">Complete checkout</button>
       </form>
     </section>
   </main>
+  <dialog class="card" id="leave-dialog" aria-labelledby="leave-title">
+    <h2 id="leave-title">Are You Sure You Want To Leave The Check Out Page?</h2>
+    <form method="dialog" class="dialog-actions">
+      <button class="secondary" value="leave">Leave</button>
+      <button value="cancel" autofocus>Cancel</button>
+    </form>
+  </dialog>
+  <dialog class="card" id="thanks-dialog" aria-labelledby="thanks-title">
+    <h2 id="thanks-title"></h2>
+    <form method="dialog"><button autofocus>Close</button></form>
+  </dialog>
 </body>
 </html>

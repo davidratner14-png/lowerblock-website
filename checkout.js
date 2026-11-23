@@ -1,7 +1,19 @@
 const itemId = new URLSearchParams(location.search).get("item");
 const loading = document.querySelector("#loading");
 const username = document.querySelector("#username");
-const status = document.querySelector("#status");
+const brand = document.querySelector("#brand");
+const leaveDialog = document.querySelector("#leave-dialog");
+const thanksDialog = document.querySelector("#thanks-dialog");
+
+brand.addEventListener("click", (event) => {
+  event.preventDefault();
+  leaveDialog.returnValue = "cancel";
+  leaveDialog.showModal();
+});
+
+leaveDialog.addEventListener("close", () => {
+  if (leaveDialog.returnValue === "leave") location.assign(brand.href);
+});
 
 async function loadOrder() {
   if (!itemId || !/^[a-z0-9-]+$/.test(itemId)) {
@@ -39,9 +51,10 @@ async function loadOrder() {
 
   document.querySelector("#preview").addEventListener("submit", (event) => {
     event.preventDefault();
-    status.textContent = `Test order complete for ${username.value}. No payment was taken and no items were delivered.`;
+    document.querySelector("#thanks-title").textContent =
+      `Thank You ${username.value}, Your Support Is Appreciated!`;
+    thanksDialog.showModal();
   });
-  username.addEventListener("input", () => { status.textContent = ""; });
   loading.hidden = true;
   document.querySelector("#order").hidden = false;
 }
