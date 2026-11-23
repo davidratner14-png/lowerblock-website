@@ -40,6 +40,10 @@
     input, button { width: 100%; padding: 12px; border-radius: 7px; font: inherit; }
     input { margin: 8px 0 16px; background: #06111b; color: white; border: 1px solid #55748c; }
     button { border: 0; background: #69c1ff; color: #07131f; font-weight: bold; cursor: pointer; }
+    fieldset { margin: 0 0 18px; padding: 16px; border: 1px solid #55748c; border-radius: 7px; }
+    legend { padding: 0 6px; font-weight: bold; }
+    input[readonly] { background: #102335; color: #d5e7f5; }
+    .card-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     #status { margin-top: 14px; }
     .note { color: #adc5d8; margin-bottom: 18px; }
   </style>
@@ -68,7 +72,29 @@
         <label for="username">Minecraft username</label>
         <input id="username" required minlength="3" maxlength="16" pattern="[A-Za-z0-9_]{3,16}"
           title="Use 3–16 letters, numbers, or underscores." autocapitalize="off" spellcheck="false">
-        <button>Preview order</button>
+        <fieldset aria-describedby="test-details">
+          <legend>Test payment details</legend>
+          <p class="note" id="test-details">Sample details are filled in for you. Use them to try the checkout.</p>
+          <label for="test-email">Email</label>
+          <input id="test-email" type="email" value="player@example.com" readonly autocomplete="off">
+          <label for="test-name">Name on card</label>
+          <input id="test-name" value="Test Player" readonly autocomplete="off">
+          <label for="test-card">Card number</label>
+          <input id="test-card" value="4242 4242 4242 4242" readonly autocomplete="off">
+          <div class="card-fields">
+            <div>
+              <label for="test-expiry">Expiration</label>
+              <input id="test-expiry" value="12/30" readonly autocomplete="off">
+            </div>
+            <div>
+              <label for="test-cvc">Security code</label>
+              <input id="test-cvc" value="123" readonly autocomplete="off">
+            </div>
+          </div>
+          <label for="test-zip">Billing ZIP code</label>
+          <input id="test-zip" value="00000" readonly autocomplete="off">
+        </fieldset>
+        <button type="submit">Place test order</button>
         <p id="status" role="status"></p>
       </form>
     </section>

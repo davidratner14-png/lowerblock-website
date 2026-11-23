@@ -39,7 +39,7 @@ async function loadOrder() {
 
   document.querySelector("#preview").addEventListener("submit", (event) => {
     event.preventDefault();
-    status.textContent = `Preview ready for ${username.value}. No order was placed.`;
+    status.textContent = `Test order complete for ${username.value}. No payment was taken and no items were delivered.`;
   });
   username.addEventListener("input", () => { status.textContent = ""; });
   loading.hidden = true;
