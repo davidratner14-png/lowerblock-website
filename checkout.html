@@ -78,25 +78,25 @@
           <legend>Practice payment details</legend>
           <p class="note">Use made-up details only.</p>
           <label for="test-email">Email</label>
-          <input id="test-email" type="email" placeholder="name@example.com" autocomplete="off">
+          <input id="test-email" required type="email" placeholder="name@example.com" autocomplete="off">
           <label for="test-name">Name on card</label>
-          <input id="test-name" placeholder="Full Name" autocomplete="off">
+          <input id="test-name" required pattern=".*\S.*" placeholder="Full Name" autocomplete="off">
           <label for="test-card">Card number</label>
-          <input id="test-card" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" autocomplete="off">
+          <input id="test-card" required inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" autocomplete="off">
           <div class="card-fields">
             <div>
               <label for="test-expiry">Expiration</label>
-              <input id="test-expiry" inputmode="numeric" maxlength="7" placeholder="MM/YY" autocomplete="off">
+              <input id="test-expiry" required inputmode="numeric" maxlength="7" placeholder="MM/YY" autocomplete="off">
             </div>
             <div>
               <label for="test-cvc">Security code</label>
-              <input id="test-cvc" inputmode="numeric" maxlength="4" placeholder="000" autocomplete="off">
+              <input id="test-cvc" required inputmode="numeric" maxlength="4" placeholder="000" autocomplete="off">
             </div>
           </div>
           <label for="test-zip">Billing ZIP code</label>
-          <input id="test-zip" inputmode="numeric" maxlength="10" placeholder="00000" autocomplete="off">
+          <input id="test-zip" required inputmode="numeric" maxlength="10" placeholder="00000" autocomplete="off">
         </fieldset>
-        <button type="submit">Complete checkout</button>
+        <button type="submit">Complete Checkout</button>
       </form>
     </section>
   </main>
@@ -109,7 +109,7 @@
   </dialog>
   <dialog class="card" id="thanks-dialog" aria-labelledby="thanks-title">
     <h2 id="thanks-title"></h2>
-    <form method="dialog"><button autofocus>Close</button></form>
+    <form method="dialog"><button autofocus>Return to Store</button></form>
   </dialog>
   <script>
     const itemId = new URLSearchParams(location.search).get("item");
@@ -118,6 +118,8 @@
     const brand = document.querySelector("#brand");
     const leaveDialog = document.querySelector("#leave-dialog");
     const thanksDialog = document.querySelector("#thanks-dialog");
+
+    thanksDialog.addEventListener("close", () => location.assign("store.html"));
 
     brand.addEventListener("click", (event) => {
       event.preventDefault();
