@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="favicon.png.png">
+  <title>LowerBlock | Checkout</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #102d50, #07131f 45%, #03080d);
+      color: #fff;
+      font: 1rem/1.5 Arial, Helvetica, sans-serif;
+    }
+    header { background: #050c14; border-bottom: 2px solid #198cff; }
+    header a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: min(92%, 720px);
+      margin: auto;
+      padding: 14px 0;
+      color: white;
+      font-size: 1.35rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    header img { width: 48px; height: 48px; object-fit: contain; }
+    main { width: min(92%, 720px); margin: 42px auto; }
+    a, #price { color: #69c1ff; }
+    h1 { margin: 15px 0; }
+    h2, p { margin: 0; }
+    .card { padding: 24px; background: #091723; border: 1px solid #21425a; border-radius: 13px; }
+    .product { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; }
+    .product img { width: 80px; height: 80px; object-fit: contain; }
+    #price { display: block; margin-top: 8px; font-size: 1.25rem; }
+    label { display: block; font-weight: bold; }
+    input, button { width: 100%; padding: 12px; border-radius: 7px; font: inherit; }
+    input { margin: 8px 0 16px; background: #06111b; color: white; border: 1px solid #55748c; }
+    button { border: 0; background: #69c1ff; color: #07131f; font-weight: bold; cursor: pointer; }
+    #status { margin-top: 14px; }
+    .note { color: #adc5d8; margin-bottom: 18px; }
+  </style>
+  <script src="checkout.js" defer></script>
+</head>
+<body>
+  <header>
+    <a href="index.html"><img src="lowerblock-logo.png (2).png" alt=""> LOWERBLOCK</a>
+  </header>
+  <main>
+    <a href="store.html">← Back to store</a>
+    <h1>Checkout</h1>
+    <p id="loading" role="status">Loading your item…</p>
+    <noscript>Enable JavaScript to load your selection.</noscript>
+    <section class="card" id="order" hidden aria-label="Order details">
+      <div class="product">
+        <img id="image" alt="" hidden>
+        <div>
+          <h2 id="item"></h2>
+          <p id="description"></p>
+          <strong id="price"></strong>
+        </div>
+      </div>
+      <p class="note">Test checkout. No payment will be collected and no items will be delivered.</p>
+      <form id="preview">
+        <label for="username">Minecraft username</label>
+        <input id="username" required minlength="3" maxlength="16" pattern="[A-Za-z0-9_]{3,16}"
+          title="Use 3–16 letters, numbers, or underscores." autocapitalize="off" spellcheck="false">
+        <button>Preview order</button>
+        <p id="status" role="status"></p>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
