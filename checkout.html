@@ -42,10 +42,9 @@
     button { border: 0; background: #69c1ff; color: #07131f; font-weight: bold; cursor: pointer; }
     fieldset { margin: 0 0 18px; padding: 16px; border: 1px solid #55748c; border-radius: 7px; }
     legend { padding: 0 6px; font-weight: bold; }
-    input[readonly] { background: #102335; color: #d5e7f5; }
     .card-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     input::placeholder { color: #adc5d8; opacity: 1; }
-    input[readonly]:focus::placeholder { color: transparent; }
+    input:focus::placeholder { color: transparent; }
     dialog { width: min(92%, 420px); color: white; }
     dialog::backdrop { background: #03080dcc; }
     dialog h2 { margin-bottom: 16px; }
@@ -53,14 +52,13 @@
     .secondary { background: #263746; color: white; }
     .note { color: #adc5d8; margin-bottom: 18px; }
   </style>
-  <script src="checkout.js" defer></script>
 </head>
 <body>
   <header>
     <a href="index.html" id="brand"><img src="lowerblock-logo.png (2).png" alt=""> LOWERBLOCK</a>
   </header>
   <main>
-    <h1>Checkout</h1>
+    <h1>Checkout Page</h1>
     <p id="loading" role="status">Loading your item…</p>
     <noscript>Enable JavaScript to load your selection.</noscript>
     <section class="card" id="order" hidden aria-label="Order details">
@@ -72,31 +70,31 @@
           <strong id="price"></strong>
         </div>
       </div>
-      <p class="note">No payment is collected on this page.</p>
       <form id="preview">
         <label for="username">Minecraft username</label>
         <input id="username" required minlength="3" maxlength="16" pattern="[A-Za-z0-9_]{3,16}"
           title="Use 3–16 letters, numbers, or underscores." autocapitalize="off" spellcheck="false">
         <fieldset>
-          <legend>Payment details</legend>
+          <legend>Practice payment details</legend>
+          <p class="note">Use made-up details only.</p>
           <label for="test-email">Email</label>
-          <input id="test-email" type="email" placeholder="name@example.com" readonly autocomplete="off">
+          <input id="test-email" type="email" placeholder="name@example.com" autocomplete="off">
           <label for="test-name">Name on card</label>
-          <input id="test-name" placeholder="Full Name" readonly autocomplete="off">
+          <input id="test-name" placeholder="Full Name" autocomplete="off">
           <label for="test-card">Card number</label>
-          <input id="test-card" placeholder="0000 0000 0000 0000" readonly autocomplete="off">
+          <input id="test-card" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" autocomplete="off">
           <div class="card-fields">
             <div>
               <label for="test-expiry">Expiration</label>
-              <input id="test-expiry" placeholder="MM/YY" readonly autocomplete="off">
+              <input id="test-expiry" inputmode="numeric" maxlength="7" placeholder="MM/YY" autocomplete="off">
             </div>
             <div>
               <label for="test-cvc">Security code</label>
-              <input id="test-cvc" placeholder="000" readonly autocomplete="off">
+              <input id="test-cvc" inputmode="numeric" maxlength="4" placeholder="000" autocomplete="off">
             </div>
           </div>
           <label for="test-zip">Billing ZIP code</label>
-          <input id="test-zip" placeholder="00000" readonly autocomplete="off">
+          <input id="test-zip" inputmode="numeric" maxlength="10" placeholder="00000" autocomplete="off">
         </fieldset>
         <button type="submit">Complete checkout</button>
       </form>
@@ -113,5 +111,74 @@
     <h2 id="thanks-title"></h2>
     <form method="dialog"><button autofocus>Close</button></form>
   </dialog>
+  <script>
+    const itemId = new URLSearchParams(location.search).get("item");
+    const loading = document.querySelector("#loading");
+    const username = document.querySelector("#username");
+    const brand = document.querySelector("#brand");
+    const leaveDialog = document.querySelector("#leave-dialog");
+    const thanksDialog = document.querySelector("#thanks-dialog");
+
+    brand.addEventListener("click", (event) => {
+      event.preventDefault();
+      leaveDialog.returnValue = "cancel";
+      leaveDialog.showModal();
+    });
+
+    leaveDialog.addEventListener("close", () => {
+      if (leaveDialog.returnValue === "leave") location.assign(brand.href);
+    });
+
+    async function loadOrder() {
+      if (!itemId || !/^[a-z0-9-]+$/.test(itemId)) {
+        loading.textContent = "Choose an item from the store to continue.";
+        return;
+      }
+
+      const response = await fetch("store.html");
+      if (!response.ok) throw new Error("Store unavailable");
+
+      // Use the store cards as the source for product names, prices and artwork.
+      const store = new DOMParser().parseFromString(await response.text(), "text/html");
+      const buyLink = store.querySelector(`.buy[href="checkout.html?item=${itemId}"]`);
+      if (!buyLink) {
+        loading.textContent = "This item is unavailable. Please choose an item from the store.";
+        return;
+      }
+
+      const product = buyLink.closest(".product");
+      const name = product.querySelector("h3").textContent.trim();
+      document.querySelector("#item").textContent = name;
+      document.querySelector("#description").textContent = product.querySelector("p").textContent.trim();
+      document.querySelector("#price").textContent = product.querySelector(".price").textContent.trim();
+
+      const image = document.querySelector("#image");
+      image.addEventListener("load", () => { image.hidden = false; });
+      image.src = product.querySelector("img").getAttribute("src");
+
+      try {
+        const savedUsername = localStorage.getItem("lowerblockMinecraftUsername");
+        if (/^[A-Za-z0-9_]{3,16}$/.test(savedUsername ?? "")) username.value = savedUsername;
+      } catch {
+        // Checkout can still accept a manually entered username when storage is blocked.
+      }
+
+      document.querySelector("#preview").addEventListener("submit", (event) => {
+        event.preventDefault();
+        document.querySelector("#thanks-title").textContent =
+          `Thank You ${username.value}, Your Support Is Appreciated!`;
+        event.currentTarget.querySelector("fieldset").querySelectorAll("input").forEach((input) => {
+          input.value = "";
+        });
+        thanksDialog.showModal();
+      });
+      loading.hidden = true;
+      document.querySelector("#order").hidden = false;
+    }
+
+    loadOrder().catch(() => {
+      loading.textContent = "Couldn’t load checkout. Try refreshing or go back to the store.";
+    });
+  </script>
 </body>
 </html>
